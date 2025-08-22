@@ -5,5 +5,6 @@ jobs:
     runs-on: ubuntu-latest
     name: A test job
     steps:
+      - uses: actions/checkout@v4
       - name: Hello world action step
         uses: ./.github/actions/default
