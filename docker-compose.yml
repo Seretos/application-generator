@@ -1,0 +1,18 @@
+services:
+  app-generator:
+    image: app-generator:latest
+    build:
+      context: ./
+      target: dev
+    #volumes:
+    #  - ./:/builds/seredos/application-bot
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    #depends_on:
+    #  - database
+    ports:
+      - 80:80
+      - 443:443
+    environment:
+      XDEBUG_CONFIG: client_host=host.docker.internal
+      PHP_IDE_CONFIG: serverName=php
