@@ -35,18 +35,44 @@ RUN mkdir -p $APP_HOME/backend/public && \
     && groupmod -o -g $HOST_GID $USERNAME \
     && chown -R ${USERNAME}:${USERNAME} $APP_HOME
 
+RUN apt-get update \
+    && apt-get install -y \
+        curl \
+        libxrender1 \
+        libjpeg62-turbo \
+        fontconfig \
+        libxtst6 \
+        xfonts-75dpi \
+        xfonts-base \
+        xz-utils \
+        libfreetype6 \
+        libpng16-16 \
+        libx11-6 \
+        libxcb1 \
+        libxext6 \
+        libssl3 \
+    && rm -rf /tmp/* \
+    && rm -rf /var/list/apt/* \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+RUN wget https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bookworm_amd64.deb \
+  && dpkg -i wkhtmltox_0.12.6.1-3.bookworm_amd64.deb \
+  && apt-get -f install -y \
+  && rm wkhtmltox_0.12.6.1-3.bookworm_amd64.deb
+
 WORKDIR $APP_HOME
 
 RUN git config --global --add safe.directory $APP_HOME
 
 COPY ./docker/config/php-log.ini /usr/local/etc/php/conf.d/php-log.ini
-COPY entrypoint.sh /entrypoint.sh
+COPY entrypoint.sh /github/workspace/entrypoint.sh
 
 EXPOSE 80
 EXPOSE 443
 
-ENTRYPOINT ["/entrypoint.sh"]
-#CMD ["supervisord","-c","/builds/seredos/application-bot/docker/config/supervisord.conf","-n"]
+ENTRYPOINT ["/github/workspace/entrypoint.sh"]
+CMD ["supervisord","-c","/github/workspace/docker/config/supervisord.conf","-n"]
 
 FROM prod AS dev
 
